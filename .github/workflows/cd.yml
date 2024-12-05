@@ -1,0 +1,20 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed # CI yml이 끝나면 실행해줘! 이걸 안쓰면 동시실행이 돼서 오류!
+
+jobs:
+  build:
+    runs-on: self-hosted  # 내가 등록한 서버에서 실행할거야!
+    steps:
+      - name: Delete Docker Image and Containers
+        run: sudo docker rm -f dweb # dweb이라는 컨테이너 삭제해줘
+
+      - name: Pull Docker Image from Docker Hub
+        run: sudo docker pull marklee12/songdo:latest # marklee12/songdo로 바꾸기
+
+      - name: Execute Docker Container
+        run: sudo docker run -d -p 80:3000 --name dweb marklee12/songdo:latest
